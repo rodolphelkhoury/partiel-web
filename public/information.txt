@@ -1,0 +1,47 @@
+[Profile]
+Name: Rodolph Khoury
+Title: Software Engineer
+Email: rodolph.khoury@net.usj.edu.lb
+Phone: +961 81 672 917
+Location: Beirut, Lebanon
+
+[About]
+Passionate developer with 5+ years of experience in building web applications. Specialized in React, Node.js, and modern web technologies. Love creating user-friendly interfaces and solving complex problems.
+
+[Experience]
+Job: Senior Developer | Tech Company Inc. | 2021 - Present
+Description: Leading development of enterprise applications using React and Node.js. Collaborating with cross-functional teams to deliver high-quality solutions.
+
+Job: Frontend Developer | Digital Agency | 2019 - 2021
+Description: Built responsive websites and web applications for various clients. Implemented modern design patterns and best practices.
+
+Job: Junior Developer | Startup Inc. | 2018 - 2019
+Description: Developed and maintained web applications. Worked on both frontend and backend features.
+
+[Skills]
+Skill: React
+Skill: JavaScript
+Skill: TypeScript
+Skill: Node.js
+Skill: CSS
+Skill: HTML
+Skill: Git
+Skill: MongoDB
+Skill: Express
+Skill: REST API
+Skill: GraphQL
+Skill: Docker
+
+[Education]
+Degree: Bachelor of Computer Science
+University: University Name
+Period: 2015 - 2019
+Description: Graduated with honors. Specialized in software engineering and web development.
+
+[Certifications]
+Cert: AWS Certified Developer | 2023
+Cert: React Professional Certificate | 2022
+
+[Languages]
+Language: English | Native
+Language: Spanish | Intermediate
