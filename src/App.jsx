@@ -117,12 +117,14 @@ function App() {
   return (
     <div className="cv-wrapper">
       {/* === PROFILE HEADER === */}
-      <h1 className="cv-name">{profile.name}</h1>
-      <div className="cv-contact-full">
-        <div className="cv-contact">
-          {profile.location} | {profile.phone}
-          <br />
-          {profile.email}
+      <div className="cv-header">
+        <div className="cv-name-contact">
+          <h1 className="cv-name">{profile.name}</h1>
+          <div className="cv-contact">
+            {profile.location} | {profile.phone}
+            <br />
+            {profile.email}
+          </div>
         </div>
         <img 
           src="/WhatsApp Image 2025-11-14 at 5.22.49 PM.jpeg" 

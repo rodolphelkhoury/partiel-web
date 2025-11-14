@@ -22,28 +22,35 @@ body {
   border-radius: 8px;
 }
 
+/* ===== HEADER CONTAINER ===== */
+.cv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+/* Name and contact together */
+.cv-name-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* ===== NAME HEADER ===== */
 .cv-name {
   font-size: 32px;
   font-weight: bold;
-  margin-bottom: 5px;
   letter-spacing: 1px;
-  text-align: left;  
 }
 
-/* ===== CONTACT & IMAGE HEADER ===== */
-.cv-contact-full {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
+/* ===== CONTACT INFO ===== */
 .cv-contact {
   font-size: 14px;
   line-height: 1.4;
 }
 
+/* ===== PROFILE IMAGE ===== */
 .cv-profile-image {
   width: 120px;
   height: 120px;
