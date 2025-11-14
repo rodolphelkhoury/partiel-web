@@ -1,6 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// Reusable components
+const ExperienceItem = ({ title, company, period, description }) => (
+  <div className="cv-experience-item">
+    <strong>{title}</strong> | {company}
+    <span className="cv-period">{period}</span>
+    <p className="cv-paragraph">{description}</p>
+  </div>
+);
+
+const EducationItem = ({ degree, university, period, description }) => (
+  <div className="cv-education">
+    <strong>{degree}</strong>
+    <div>{university}</div>
+    <div className="cv-period">{period}</div>
+    <p className="cv-paragraph">{description}</p>
+  </div>
+);
+
+const CertificationItem = ({ name, date }) => (
+  <div className="cv-paragraph">
+    • <strong>{name}</strong> ({date})
+  </div>
+);
+
+const LanguageItem = ({ name, level }) => (
+  <div className="cv-paragraph">
+    • {name} — {level}
+  </div>
+);
+
 function App() {
   const [cvData, setCvData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,22 +40,19 @@ function App() {
     const fetchCVData = async () => {
       try {
         const response = await fetch('/information.txt');
-        if (!response.ok) {
-          throw new Error('Failed to load CV data');
-        }
+        if (!response.ok) throw new Error('Failed to load CV data');
         const text = await response.text();
-        const parsed = parseInformationFile(text);
-        setCvData(parsed);
-        setLoading(false);
+        setCvData(parseInformationFile(text));
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
-
     fetchCVData();
   }, []);
 
+  // Smarter parsing using section handlers
   const parseInformationFile = (text) => {
     const data = {
       profile: {},
@@ -34,54 +61,49 @@ function App() {
       skills: [],
       education: {},
       certifications: [],
-      languages: []
+      languages: [],
     };
 
-    const lines = text.split('\n');
-    let currentSection = '';
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (line.startsWith('[') && line.endsWith(']')) {
-        currentSection = line.slice(1, -1).toLowerCase();
-        continue;
-      }
-
-      if (!line || line.startsWith('#')) continue;
-
-      const [key, ...valueParts] = line.split(':');
-      const value = valueParts.join(':').trim();
-
-      if (currentSection === 'profile') {
-        data.profile[key.trim().toLowerCase()] = value;
-      } else if (currentSection === 'about') {
-        data.about += (data.about ? ' ' : '') + line;
-      } else if (currentSection === 'experience') {
-        if (key.trim().toLowerCase() === 'job') {
+    const handlers = {
+      profile: (key, value) => (data.profile[key.toLowerCase()] = value),
+      about: (_, value) => (data.about += (data.about ? ' ' : '') + value),
+      experience: (key, value) => {
+        key = key.toLowerCase();
+        if (key === 'job') {
           const [title, company, period] = value.split('|').map(s => s.trim());
           data.experience.push({ title, company, period, description: '' });
-        } else if (key.trim().toLowerCase() === 'description') {
+        } else if (key === 'description') {
           data.experience[data.experience.length - 1].description = value;
         }
-      } else if (currentSection === 'skills') {
-        if (key.trim().toLowerCase() === 'skill') {
-          data.skills.push(value);
-        }
-      } else if (currentSection === 'education') {
-        data.education[key.trim().toLowerCase()] = value;
-      } else if (currentSection === 'certifications') {
-        if (key.trim().toLowerCase() === 'cert') {
+      },
+      skills: (key, value) => key.toLowerCase() === 'skill' && data.skills.push(value),
+      education: (key, value) => (data.education[key.toLowerCase()] = value),
+      certifications: (key, value) => {
+        if (key.toLowerCase() === 'cert') {
           const [name, date] = value.split('|').map(s => s.trim());
           data.certifications.push({ name, date });
         }
-      } else if (currentSection === 'languages') {
-        if (key.trim().toLowerCase() === 'language') {
+      },
+      languages: (key, value) => {
+        if (key.toLowerCase() === 'language') {
           const [name, level] = value.split('|').map(s => s.trim());
           data.languages.push({ name, level });
         }
+      },
+    };
+
+    let currentSection = '';
+    text.split('\n').forEach(line => {
+      line = line.trim();
+      if (!line || line.startsWith('#')) return;
+      if (line.startsWith('[') && line.endsWith(']')) {
+        currentSection = line.slice(1, -1).toLowerCase();
+        return;
       }
-    }
+      const [key, ...valueParts] = line.split(':');
+      const value = valueParts.join(':').trim();
+      handlers[currentSection]?.(key.trim(), value);
+    });
 
     return data;
   };
@@ -90,16 +112,17 @@ function App() {
   if (error) return <div className="cv-wrapper">Error: {error}</div>;
   if (!cvData) return null;
 
+  const { profile, about, experience, education, skills, certifications, languages } = cvData;
+
   return (
     <div className="cv-wrapper">
-
-      {/* === NAME HEADER === */}
-      <h1 className="cv-name">{cvData.profile.name}</h1>
+      {/* === PROFILE HEADER === */}
+      <h1 className="cv-name">{profile.name}</h1>
       <div className="cv-contact-full">
         <div className="cv-contact">
-          {cvData.profile.location} | {cvData.profile.phone}
+          {profile.location} | {profile.phone}
           <br />
-          {cvData.profile.email}
+          {profile.email}
         </div>
         <img 
           src="/WhatsApp Image 2025-11-14 at 5.22.49 PM.jpeg" 
@@ -108,52 +131,53 @@ function App() {
         />
       </div>
 
-
-
-      {/* === ABOUT / SUMMARY === */}
-      <h2 className="cv-section-title">SUMMARY</h2>
-      <p className="cv-paragraph">{cvData.about}</p>
+      {/* === ABOUT === */}
+      {about && (
+        <>
+          <h2 className="cv-section-title">SUMMARY</h2>
+          <p className="cv-paragraph">{about}</p>
+        </>
+      )}
 
       {/* === EXPERIENCE === */}
-      <h2 className="cv-section-title">WORK EXPERIENCE</h2>
-      {cvData.experience.map((exp, idx) => (
-        <div key={idx} className="cv-experience-item">
-          <strong>{exp.title}</strong> | {exp.company}
-          <span className="cv-period">{exp.period}</span>
-          <p className="cv-paragraph">{exp.description}</p>
-        </div>
-      ))}
+      {experience.length > 0 && (
+        <>
+          <h2 className="cv-section-title">WORK EXPERIENCE</h2>
+          {experience.map((exp, idx) => <ExperienceItem key={idx} {...exp} />)}
+        </>
+      )}
 
       {/* === EDUCATION === */}
-      <h2 className="cv-section-title">EDUCATION</h2>
-      <div className="cv-education">
-        <strong>{cvData.education.degree}</strong>
-        <div>{cvData.education.university}</div>
-        <div className="cv-period">{cvData.education.period}</div>
-        <p className="cv-paragraph">{cvData.education.description}</p>
-      </div>
+      {Object.keys(education).length > 0 && (
+        <>
+          <h2 className="cv-section-title">EDUCATION</h2>
+          <EducationItem {...education} />
+        </>
+      )}
 
       {/* === SKILLS === */}
-      <h2 className="cv-section-title">SKILLS</h2>
-      <p className="cv-paragraph">
-        {cvData.skills.join(', ')}
-      </p>
+      {skills.length > 0 && (
+        <>
+          <h2 className="cv-section-title">SKILLS</h2>
+          <p className="cv-paragraph">{skills.join(', ')}</p>
+        </>
+      )}
 
       {/* === CERTIFICATIONS === */}
-      <h2 className="cv-section-title">CERTIFICATIONS</h2>
-      {cvData.certifications.map((cert, idx) => (
-        <div key={idx} className="cv-paragraph">
-          • <strong>{cert.name}</strong> ({cert.date})
-        </div>
-      ))}
+      {certifications.length > 0 && (
+        <>
+          <h2 className="cv-section-title">CERTIFICATIONS</h2>
+          {certifications.map((cert, idx) => <CertificationItem key={idx} {...cert} />)}
+        </>
+      )}
 
       {/* === LANGUAGES === */}
-      <h2 className="cv-section-title">LANGUAGES</h2>
-      {cvData.languages.map((lang, idx) => (
-        <div key={idx} className="cv-paragraph">
-          • {lang.name} — {lang.level}
-        </div>
-      ))}
+      {languages.length > 0 && (
+        <>
+          <h2 className="cv-section-title">LANGUAGES</h2>
+          {languages.map((lang, idx) => <LanguageItem key={idx} {...lang} />)}
+        </>
+      )}
     </div>
   );
 }
