@@ -95,11 +95,20 @@ function App() {
 
       {/* === NAME HEADER === */}
       <h1 className="cv-name">{cvData.profile.name}</h1>
-      <div className="cv-contact">
-        {cvData.profile.location} | {cvData.profile.phone}
-        <br />
-        {cvData.profile.email}
+      <div className="cv-contact-full">
+        <div className="cv-contact">
+          {cvData.profile.location} | {cvData.profile.phone}
+          <br />
+          {cvData.profile.email}
+        </div>
+        <img 
+          src="/WhatsApp Image 2025-11-14 at 5.22.49 PM.jpeg" 
+          alt="Profile" 
+          className="cv-profile-image"
+        />
       </div>
+
+
 
       {/* === ABOUT / SUMMARY === */}
       <h2 className="cv-section-title">SUMMARY</h2>
